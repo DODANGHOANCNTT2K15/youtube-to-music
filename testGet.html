@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Get Audio & JSON từ Link</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background: #f8f9fa;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-audio {
+            background: #007bff;
+            color: white;
+        }
+        .btn-json {
+            background: #28a745;
+            color: white;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f4f4f4;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        audio {
+            width: 100%;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Test Music từ Link</h1>
+        
+        <label><strong>Nhập link đường dẫn:</strong></label>
+        <input type="text" id="linkInput" placeholder="https://example.com/bai-hat.mp3 hoặc link YouTube..." />
+
+        <div>
+            <button class="btn-audio" onclick="getAudioLink()">▶️ Get Audio Link</button>
+            <button class="btn-json" onclick="getJsonLink()">📄 Get JSON Info</button>
+        </div>
+
+        <div id="result"></div>
+        <audio id="audioPlayer" controls></audio>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://127.0.0.1:5000';
+
+        async function getAudioLink() {
+            const link = document.getElementById('linkInput').value.trim();
+            const resultDiv = document.getElementById('result');
+            const player = document.getElementById('audioPlayer');
+
+            if (!link) {
+                resultDiv.innerHTML = `<span style="color:red">Vui lòng nhập link!</span>`;
+                return;
+            }
+
+            resultDiv.innerHTML = `Đang xử lý audio...`;
+
+            try {
+                // Gọi hàm get_audio_link trong get-audio.py
+                const response = await fetch(`${BASE_URL}/get-audio-link?url=${encodeURIComponent(link)}`);
+                const data = await response.json();
+
+                if (data.audio_url) {
+                    player.src = data.audio_url;
+                    resultDiv.innerHTML = `
+                        <strong>✅ Audio URL:</strong><br>
+                        <a href="${data.audio_url}" target="_blank">${data.audio_url}</a>
+                    `;
+                    player.play();
+                } else {
+                    resultDiv.innerHTML = `<span style="color:red">Lỗi: ${data.error || 'Không lấy được audio'}</span>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<span style="color:red">Lỗi kết nối: ${err.message}</span>`;
+            }
+        }
+
+        async function getJsonLink() {
+            const link = document.getElementById('linkInput').value.trim();
+            const resultDiv = document.getElementById('result');
+            const player = document.getElementById('audioPlayer');
+
+            if (!link) {
+                resultDiv.innerHTML = `<span style="color:red">Vui lòng nhập link!</span>`;
+                return;
+            }
+
+            resultDiv.innerHTML = `Đang lấy thông tin JSON...`;
+            player.src = '';  // reset audio
+
+            try {
+                // Gọi hàm get_json_link trong get-music-json.py
+                const response = await fetch(`${BASE_URL}/get-json-link?url=${encodeURIComponent(link)}`);
+                const data = await response.json();
+
+                resultDiv.innerHTML = `<strong>Kết quả JSON:</strong><br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (err) {
+                resultDiv.innerHTML = `<span style="color:red">Lỗi kết nối: ${err.message}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

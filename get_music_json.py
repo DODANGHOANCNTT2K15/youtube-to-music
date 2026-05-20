@@ -63,3 +63,4 @@ def get_json_link(link):
         json.dump(cleaned, f, ensure_ascii=False, indent=2)
 
     print("Success Get JSON!")
+    return cleaned

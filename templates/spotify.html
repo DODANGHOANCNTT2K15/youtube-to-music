@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Library</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/spotify.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    {% if current_track %}
+    <div class="app-shell">
+        <aside class="sidebar">
+            <section class="nav-box">
+                <div class="brand">
+                    <span class="brand-mark">
+                        <img src="static\logo.jpg" alt="" id="logo">
+                    </span>
+                    <span>Music</span>
+                </div>
+                <form class="add-music-form" id="addMusicForm">
+                    <div class="add-music-title"><span>+</span><span>Add Music</span></div>
+                    <input
+                        class="add-music-input"
+                        id="musicUrl"
+                        name="url"
+                        type="url"
+                        placeholder="Paste YouTube link"
+                        autocomplete="off"
+                        required
+                    >
+                    <button class="add-music-button" id="addMusicButton" type="submit">Add to Library</button>
+                    <div class="add-music-status" id="addMusicStatus"></div>
+                </form>
+            </section>
+
+            <section class="library-box">
+                <div class="library-head playlist-head">
+                    <div class="library-title"><span>▤</span><span>Playlists</span></div>
+                    <button class="icon-button small" id="addPlaylistButton" type="button" aria-label="Add playlist">+</button>
+                </div>
+
+                <div class="playlist-list" id="playlistList">
+                    {% for playlist_name in playlists.keys() %}
+                    <button class="playlist-item {% if loop.first %}is-active{% endif %}" type="button" data-playlist-name="{{ playlist_name }}">{{ playlist_name }}</button>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <div class="modal-backdrop hidden" id="playlistModal">
+                <div class="modal">
+                    <h2 class="modal-title">Create Playlist</h2>
+                    <input class="modal-input" id="playlistNameInput" type="text" placeholder="Playlist name" />
+                    <div class="modal-actions">
+                        <button class="modal-button" id="cancelPlaylistButton" type="button">Cancel</button>
+                    <button class="modal-button primary" id="confirmPlaylistButton" type="button">Create</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-backdrop hidden" id="addToPlaylistModal">
+                <div class="modal">
+                    <h2 class="modal-title">Add track to playlist</h2>
+                    <div class="modal-list" id="addToPlaylistList"></div>
+                    <div class="modal-actions">
+                        <button class="modal-button" id="cancelAddToPlaylistButton" type="button">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-backdrop hidden" id="deletePlaylistModal">
+                <div class="modal">
+                    <h2 class="modal-title">Delete playlist?</h2>
+                    <p class="modal-text" id="deletePlaylistMessage"></p>
+                    <div class="modal-actions">
+                        <button class="modal-button" id="cancelDeletePlaylistButton" type="button">Cancel</button>
+                        <button class="modal-button primary" id="confirmDeletePlaylistButton" type="button">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-view">
+            <header class="topbar">
+                <div class="topbar-title">Local music from YouTube</div>
+            </header>
+
+            <section class="hero">
+                <img class="cover" id="heroCover" src="{{ current_track.thumbnail }}" alt="">
+                <div>
+                    <div class="eyebrow">Playlist</div>
+                    <h1 id="playlistTitle">Added Music</h1>
+                    <div class="meta">
+                        <strong id="heroArtist">{{ current_track.artist }}</strong>
+                        <span id="playlistCount">{{ tracks|length }} songs</span>
+                        <span id="heroDuration">{{ current_track.duration }}</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <div class="action-row">
+                    <button class="play-main" id="mainPlayButton" type="button" aria-label="Play">▶</button>
+                    <div class="playlist-actions">
+                        <button class="playlist-options-button" id="playlistOptionsButton" type="button" aria-label="Playlist options">⋯</button>
+                    </div>
+                </div>
+
+                <div class="table-head">
+                    <div>#</div>
+                    <div>Title</div>
+                    <div>Tags</div>
+                    <div>Views</div>
+                    <div>Time</div>
+                    <div>Playlist</div>
+                </div>
+
+                {% for track in tracks %}
+                <article class="song-row {% if loop.first %}is-active{% endif %}" data-track-index="{{ loop.index0 }}" data-track-id="{{ track.id }}">
+                    <div class="row-number">{{ loop.index }}</div>
+                    <div class="song-main">
+                        <img class="thumb" src="{{ track.thumbnail }}" alt="">
+                        <div>
+                            <div class="track-title">{{ track.title }}</div>
+                            <div class="track-artist">{{ track.artist }}</div>
+                        </div>
+                    </div>
+                    <div class="tag-list">
+                        {% for tag in track.tags[:3] %}
+                        <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="small-text">{{ "{:,}".format(track.views) }}</div>
+                    <div class="small-text">{{ track.duration }}</div>
+                    <div class="row-actions">
+                        <button class="row-action add" type="button" data-row-action="add" data-track-id="{{ track.id }}">Add</button>
+                        <button class="row-action remove" type="button" data-row-action="remove" data-track-id="{{ track.id }}">Remove</button>
+                    </div>
+                </article>
+                {% endfor %}
+            </section>
+        </main>
+
+        <aside class="lyrics-panel">
+            <div class="panel-title">
+                <span>Now Playing</span>
+            </div>
+            <section class="now-card">
+                <img id="nowCover" src="{{ current_track.thumbnail }}" alt="">
+                <div class="now-card-body">
+                    <div class="track-title" id="nowTitle">{{ current_track.title }}</div>
+                    <div class="track-artist" id="nowArtist">{{ current_track.artist }}</div>
+                </div>
+            </section>
+            <section class="lyrics-box">
+                <p class="lyrics-line" id="lyricsTitle">Subtitles</p>
+                <p class="lyrics-muted" id="lyricsDescription">Phụ đề sẽ tự chạy theo thời gian phát nhạc.</p>
+                <p class="lyrics-muted" id="lyricsStatus">
+                    Trạng thái hiện tại:
+                    {% if current_track.has_lyrics %}JSON có dữ liệu subtitle/caption.{% else %}Chưa có dữ liệu lyric trong JSON.{% endif %}
+                </p>
+                <div class="subtitle-list" id="subtitleList"></div>
+            </section>
+        </aside>
+    </div>
+
+    <footer class="player">
+        <div class="player-track">
+            <img class="thumb" id="playerCover" src="{{ current_track.thumbnail }}" alt="">
+            <div>
+                <div class="track-title" id="playerTitle">{{ current_track.title }}</div>
+                <div class="track-artist" id="playerArtist">{{ current_track.artist }}</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-buttons">
+                <button class="control-button" type="button" aria-label="Shuffle">⇄</button>
+                <button class="control-button" id="previousButton" type="button" aria-label="Previous">⏮</button>
+                <button class="control-button primary" id="playPauseButton" type="button" aria-label="Play">▶</button>
+                <button class="control-button" id="nextButton" type="button" aria-label="Next">⏭</button>
+                <button class="control-button" type="button" aria-label="Repeat">↻</button>
+            </div>
+            <div class="progress-row">
+                <span id="currentTime">0:00</span>
+                <div class="bar" id="progressBar">
+                    <div class="bar-fill" id="progressFill"></div>
+                    <div class="progress-thumb" id="progressThumb"></div>
+                </div>
+                <span id="totalTime">{{ current_track.duration }}</span>
+            </div>
+        </div>
+
+        <div class="right-tools">
+            <div class="volume-row">
+                <button class="volume-icon" id="volumeIcon" type="button" aria-label="Toggle mute">
+                    <span class="volume-symbol" aria-hidden="true"></span>
+                </button>
+                <div class="volume-bar" id="volumeBar">
+                    <div class="bar-fill" id="volumeFill"></div>
+                    <div class="volume-thumb" id="volumeThumb"></div>
+                </div>
+            </div>
+
+            <audio class="audio-native" id="audioPlayer" preload="metadata" src="{{ current_track.audio_url or '' }}"></audio>
+        </div>
+    </footer>
+    {% else %}
+    <main class="empty-state">
+        <h1>Chưa có bài hát</h1>
+        <p>Thêm file JSON vào thư mục storage/jsonmusic để hiển thị thư viện.</p>
+    </main>
+    {% endif %}
+    <script id="tracks-data" type="application/json">
+        {{ tracks|tojson }}
+    </script>
+    <script id="playlists-data" type="application/json">
+        {{ playlists|tojson }}
+    </script>
+    <script src="{{ url_for('static', filename='js/spotify.js') }}"></script>
+</body>
+</html>

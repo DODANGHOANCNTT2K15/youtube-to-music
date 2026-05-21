@@ -252,10 +252,6 @@ python -m pip install yt-dlp
 - Kiểm tra port 5000 có bị dùng bởi ứng dụng khác không
 - Thử chạy với port khác: `python app.py --port 8000`
 
-### "Phụ đề không hiển thị"
-
-- Kiểm tra video có phụ đề tiếng Việt/Anh không
-- Thử ngôn ngữ khác trong URL: `?lang=en,ja`
 
 ---
 
@@ -263,12 +259,6 @@ python -m pip install yt-dlp
 
 - 🐛 Issues: [GitHub Issues](https://github.com/DODANGHOANCNTT2K15/youtube-to-music/issues)
 - 💬 Discussions: [GitHub Discussions](https://github.com/DODANGHOANCNTT2K15/youtube-to-music/discussions)
-
----
-
-## 📄 License
-
-Project này được cấp phép dưới MIT License - xem file [LICENSE](LICENSE) để chi tiết
 
 ---
 

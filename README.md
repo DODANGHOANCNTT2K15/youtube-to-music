@@ -2,7 +2,6 @@
 
 > Một ứng dụng web để tải nhạc từ YouTube và xây dựng thư viện nhạc cá nhân của bạn
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-Latest-green.svg)](https://flask.palletsprojects.com/)
 

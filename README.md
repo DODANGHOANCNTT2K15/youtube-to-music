@@ -11,7 +11,6 @@
 ## ✨ Tính năng chính
 
 - 🎥 **Tải nhạc từ YouTube**: Hỗ trợ tải audio chất lượng cao từ các video YouTube
-- 🎵 **Quản lý thư viện**: Xem, sắp xếp và quản lý danh sách nhạc của bạn
 - 📋 **Tạo Playlist**: Tổ chức nhạc thành các playlist theo sở thích
 - 📝 **Hỗ trợ phụ đề**: Tải và hiển thị phụ đề (Vietnamese, English, ...)
 - 🎨 **Giao diện thân thiện**: Thiết kế UI hiện đại giống Spotify

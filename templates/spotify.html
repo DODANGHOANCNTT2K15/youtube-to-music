@@ -8,7 +8,6 @@
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
-    {% if current_track %}
     <div class="app-shell">
         <aside class="sidebar">
             <section class="nav-box">
@@ -53,7 +52,7 @@
                     <input class="modal-input" id="playlistNameInput" type="text" placeholder="Playlist name" />
                     <div class="modal-actions">
                         <button class="modal-button" id="cancelPlaylistButton" type="button">Cancel</button>
-                    <button class="modal-button primary" id="confirmPlaylistButton" type="button">Create</button>
+                        <button class="modal-button primary" id="confirmPlaylistButton" type="button">Create</button>
                     </div>
                 </div>
             </div>
@@ -85,6 +84,7 @@
                 <div class="topbar-title">Local music from YouTube</div>
             </header>
 
+            {% if current_track %}
             <section class="hero">
                 <img class="cover" id="heroCover" src="{{ current_track.thumbnail }}" alt="">
                 <div>
@@ -139,8 +139,16 @@
                 </article>
                 {% endfor %}
             </section>
+            {% else %}
+            <section class="empty-state">
+                <h1>Thư viện trống</h1>
+                <p>Hiện chưa có bài hát nào trong thư viện của bạn.</p>
+                <p>Hãy dán link YouTube vào form ở bên trái để thêm nhạc.</p>
+            </section>
+            {% endif %}
         </main>
 
+        {% if current_track %}
         <aside class="lyrics-panel">
             <div class="panel-title">
                 <span>Now Playing</span>
@@ -162,8 +170,10 @@
                 <div class="subtitle-list" id="subtitleList"></div>
             </section>
         </aside>
+        {% endif %}
     </div>
 
+    {% if current_track %}
     <footer class="player">
         <div class="player-track">
             <img class="thumb" id="playerCover" src="{{ current_track.thumbnail }}" alt="">
@@ -205,12 +215,8 @@
             <audio class="audio-native" id="audioPlayer" preload="metadata" src="{{ current_track.audio_url or '' }}"></audio>
         </div>
     </footer>
-    {% else %}
-    <main class="empty-state">
-        <h1>Chưa có bài hát</h1>
-        <p>Thêm file JSON vào thư mục storage/jsonmusic để hiển thị thư viện.</p>
-    </main>
     {% endif %}
+
     <script id="tracks-data" type="application/json">
         {{ tracks|tojson }}
     </script>
